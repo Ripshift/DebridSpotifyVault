@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debridify – Spotify to Real-Debrid</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .trackers-section {
+      margin-bottom: 25px;
+    }
+
+    .trackers-section h3 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .tracker-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .tracker-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .tracker-item:hover {
+      background: #f5f5f5;
+    }
+
+    .tracker-item input[type="checkbox"] {
+      margin-right: 12px;
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+    }
+
+    .tracker-item label {
+      margin: 0;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      color: #667eea;
+      margin-top: 20px;
+    }
+
+    .error {
+      display: none;
+      padding: 12px;
+      background: #ffebee;
+      color: #c62828;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .success {
+      display: none;
+      padding: 12px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    .back-btn {
+      background: #f0f0f0;
+      color: #333;
+      margin-top: 15px;
+    }
+
+    .back-btn:hover {
+      background: #e0e0e0;
+    }
+
+    .auth-button {
+      background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
+      margin-bottom: 15px;
+    }
+
+    .instructions {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .progress {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .progress-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      transition: background 0.3s;
+    }
+
+    .progress-dot.active {
+      background: #667eea;
+    }
+
+    .progress-dot.done {
+      background: #4caf50;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎵 Debridify</h1>
+    <p class="subtitle">Convert Spotify playlists to Real-Debrid torrents</p>
+
+    <div id="error" class="error"></div>
+    <div id="success" class="success"></div>
+
+    <!-- Step 1: Config -->
+    <div id="step-config" class="step active">
+      <div class="progress">
+        <div class="progress-dot active"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+      </div>
+
+      <form id="configForm">
+        <div class="form-group">
+          <label for="debridToken">Real-Debrid API Token</label>
+          <input
+            type="password"
+            id="debridToken"
+            name="debridToken"
+            placeholder="Paste your Real-Debrid API key"
+            required
+          />
+          <div class="instructions">
+            Get your API token from <a href="https://real-debrid.com/account/credentials" target="_blank">Real-Debrid Settings</a>
+          </div>
+        </div>
+
+        <div class="form-group trackers-section">
+          <label>Select Trackers</label>
+          <div class="tracker-list" id="trackerList">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <button type="submit">Next: Select Playlist</button>
+      </form>
+    </div>
+
+    <!-- Step 2: Spotify Auth & Playlist Selection -->
+    <div id="step-playlist" class="step">
+      <div class="progress">
+        <div class="progress-dot done"></div>
+        <div class="progress-dot active"></div>
+        <div class="progress-dot"></div>
+      </div>
+
+      <div class="instructions">
+        You'll be redirected to Spotify to authorize access to your playlists.
+      </div>
+
+      <button id="spotifyAuthBtn" type="button">🎵 Authorize with Spotify</button>
+
+      <div class="form-group">
+        <label for="playlistId">Or paste Spotify Playlist ID:</label>
+        <input
+          type="text"
+          id="playlistId"
+          placeholder="e.g., 37i9dQZF1DXcBWIGoYsB"
+        />
+        <button id="proceedBtn" type="button" style="margin-top: 10px;">Proceed to Import</button>
+      </div>
+
+      <button id="backFromPlaylist" class="back-btn" type="button">Back</button>
+    </div>
+
+    <!-- Step 3: Import -->
+    <div id="step-import" class="step">
+      <div class="progress">
+        <div class="progress-dot done"></div>
+        <div class="progress-dot done"></div>
+        <div class="progress-dot active"></div>
+      </div>
+
+      <div id="importStatus">
+        <p style="text-align: center; color: #666; margin: 20px 0;">Importing playlist...</p>
+        <div class="loading" style="display: block;">
+          <p>⏳ This may take a few minutes...</p>
+        </div>
+      </div>
+
+      <div id="importResults" style="display: none; max-height: 300px; overflow-y: auto;">
+        <!-- Results populated by JS -->
+      </div>
+
+      <button id="startOver" type="button" style="display: none; margin-top: 15px;">Start Over</button>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let state = {
+      debridToken: null,
+      selectedTrackers: [],
+      playlistId: null,
+      accessToken: null,
+    };
+
+    const trackers = [
+      { id: 'opentrackr', name: 'OpenTrackr' },
+      { id: 'coppersurfer', name: 'Coppersurfer (UDP)' },
+      { id: 'kicks-ass', name: 'Kicks Ass' },
+      { id: 'explodie', name: 'Explodie' },
+      { id: 'pow7', name: 'Pow7' },
+      { id: 'torrent-gresille', name: 'Torrent Gresille' },
+      { id: 'tracker-internetwarriors', name: 'Internet Warriors' },
+      { id: 'tracker-leechers', name: 'Leechers Paradise (UDP)' },
+      { id: 'tracker-pirate', name: 'Pirate Public (UDP)' },
+      { id: 'tracker-skyts', name: 'SkyTS' },
+      { id: 'tracker-filetracker', name: 'FileTracker' },
+      { id: 'tracker-flashtorrents', name: 'FlashTorrents' },
+      { id: 'tracker-mg64', name: 'MG64' },
+      { id: 'tracker-tiny-vps', name: 'Tiny VPS' },
+      { id: 'rarbg-2710', name: 'RARBG (UDP)' },
+      { id: 'zer0day', name: 'Zer0Day (UDP)' },
+      { id: 'open-stealth', name: 'Open Stealth (UDP)' },
+      { id: 'shadowshq-eddie', name: 'ShadowSHQ Eddie (UDP)' },
+    ];
+
+    // Trackers checked by default
+    const defaultTrackers = [
+      'opentrackr',
+      'coppersurfer',
+      'kicks-ass',
+      'explodie',
+      'pow7',
+      'tracker-leechers',
+      'rarbg-2710',
+    ];
+
+    // Initialize tracker list
+    function initTrackers() {
+      const list = document.getElementById('trackerList');
+      list.innerHTML = trackers.map(t => `
+        <div class="tracker-item">
+          <input type="checkbox" id="tracker-${t.id}" value="${t.id}" ${defaultTrackers.includes(t.id) ? 'checked' : ''}>
+          <label for="tracker-${t.id}">${t.name}</label>
+        </div>
+      `).join('');
+    }
+
+    // Step 1: Config form submit
+    document.getElementById('configForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      state.debridToken = document.getElementById('debridToken').value;
+      state.selectedTrackers = Array.from(
+        document.querySelectorAll('input[type="checkbox"]:checked')
+      ).map(cb => cb.value);
+
+      if (!state.debridToken) {
+        showError('Real-Debrid API token is required');
+        return;
+      }
+
+      goToStep('playlist');
+    });
+
+    // Step 2: Spotify auth
+    document.getElementById('spotifyAuthBtn').addEventListener('click', () => {
+      window.location.href = '/api/auth/spotify';
+    });
+
+    // Step 2: Manual playlist ID
+    document.getElementById('proceedBtn').addEventListener('click', () => {
+      const playlistId = document.getElementById('playlistId').value;
+      if (!playlistId) {
+        showError('Please enter a playlist ID or authorize with Spotify');
+        return;
+      }
+      state.playlistId = playlistId;
+      startImport();
+    });
+
+    // Back buttons
+    document.getElementById('backFromPlaylist').addEventListener('click', () => {
+      goToStep('config');
+    });
+
+    document.getElementById('startOver').addEventListener('click', () => {
+      state = {
+        debridToken: null,
+        selectedTrackers: [],
+        playlistId: null,
+        accessToken: null,
+      };
+      goToStep('config');
+      document.getElementById('configForm').reset();
+    });
+
+    // Helper functions
+    function goToStep(step) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById(`step-${step}`).classList.add('active');
+      clearMessages();
+    }
+
+    function startImport() {
+      goToStep('import');
+      
+      // Simulate checking for access token in URL or localStorage
+      const params = new URLSearchParams(window.location.search);
+      const accessToken = params.get('accessToken') || localStorage.getItem('spotifyAccessToken');
+      
+      if (accessToken) {
+        state.accessToken = accessToken;
+        localStorage.removeItem('spotifyAccessToken');
+      }
+
+      performImport();
+    }
+
+    async function performImport() {
+      try {
+        const response = await fetch('/api/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            playlistId: state.playlistId,
+            accessToken: state.accessToken,
+            debridToken: state.debridToken,
+            trackers: state.selectedTrackers,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Import failed');
+        }
+
+        displayResults(data);
+      } catch (err) {
+        showError(`Import failed: ${err.message}`);
+        document.getElementById('importStatus').style.display = 'none';
+        document.getElementById('startOver').style.display = 'block';
+      }
+    }
+
+    function displayResults(data) {
+      const status = document.getElementById('importStatus');
+      const results = document.getElementById('importResults');
+
+      status.style.display = 'none';
+      results.style.display = 'block';
+
+      let html = `<h3>Import Complete</h3>`;
+      html += `<p><strong>${data.total}</strong> tracks processed:</p>`;
+      html += `<ul style="margin: 15px 0; padding-left: 20px;">`;
+
+      (data.results || []).forEach(r => {
+        const icon = r.status === 'added' ? '✅' : '❌';
+        html += `<li style="margin-bottom: 8px;">${icon} ${r.track} <small>(${r.status})</small></li>`;
+      });
+
+      html += `</ul>`;
+      results.innerHTML = html;
+      document.getElementById('startOver').style.display = 'block';
+    }
+
+    function showError(msg) {
+      const err = document.getElementById('error');
+      err.textContent = msg;
+      err.style.display = 'block';
+    }
+
+    function clearMessages() {
+      document.getElementById('error').style.display = 'none';
+      document.getElementById('success').style.display = 'none';
+    }
+
+    // Initialize on load
+    initTrackers();
+
+    // Check if we're coming back from Spotify callback
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('accessToken')) {
+      state.accessToken = params.get('accessToken');
+      state.playlistId = params.get('playlistId');
+      if (state.accessToken && state.playlistId) {
+        if (!state.debridToken) {
+          showError('Please configure your Real-Debrid token first');
+        } else {
+          startImport();
+        }
+      }
+    }
+  </script>
+</body>
+</html>

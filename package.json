@@ -1,0 +1,25 @@
+{
+  "name": "debridify",
+  "version": "0.1.0",
+  "description": "Service that copies Spotify playlists into a Real-Debrid library via public trackers",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "vercel dev",
+    "deploy": "vercel"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/node": "^3.0.7",
+    "axios": "^1.4.0",
+    "spotify-web-api-node": "^5.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.3.1",
+    "@types/spotify-web-api-node": "^5.0.1",
+    "typescript": "^5.1.6",
+    "vercel": "^32.0.0"
+  }
+}
