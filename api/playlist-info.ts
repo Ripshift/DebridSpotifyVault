@@ -21,7 +21,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const info = await getPlaylistInfo(accessToken, playlistId);
     res.status(200).json(info);
   } catch (err) {
-    console.error('Playlist info error:', err);
-    res.status(500).json({ error: 'Failed to fetch playlist info' });
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error('Playlist info error:', errMsg, err);
+    res.status(500).json({ error: 'Failed to fetch playlist info', details: errMsg });
   }
 }

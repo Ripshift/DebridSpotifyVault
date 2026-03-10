@@ -67,13 +67,18 @@ export const getPlaylistInfo = async (
 
   const data = await api.getPlaylist(playlistId);
   const p = data.body;
+  
+  if (!p) {
+    throw new Error('Playlist not found or not accessible');
+  }
+
   return {
-    id: p.id,
-    name: p.name,
+    id: p.id || playlistId,
+    name: p.name || 'Untitled Playlist',
     description: p.description || '',
-    owner: p.owner.display_name || p.owner.id,
+    owner: p.owner?.display_name || p.owner?.id || 'Unknown',
     imageUrl: p.images?.[0]?.url || '',
-    totalTracks: p.tracks.total,
-    spotifyUrl: p.external_urls.spotify,
+    totalTracks: p.tracks?.total || 0,
+    spotifyUrl: p.external_urls?.spotify || `https://open.spotify.com/playlist/${playlistId}`,
   };
 };

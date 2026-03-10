@@ -661,7 +661,7 @@
         });
         const playlistInfo = await infoResp.json();
         console.log('[Import] Playlist info response:', { status: infoResp.status, ok: infoResp.ok, data: playlistInfo });
-        if (!infoResp.ok) throw new Error(`Playlist info failed (${infoResp.status}): ${playlistInfo.error || playlistInfo.message || 'Unknown error'}`);
+        if (!infoResp.ok) throw new Error(`Playlist info failed (${infoResp.status}): ${playlistInfo.details || playlistInfo.error || 'Unknown error'}`);
 
         document.getElementById('progressFill').style.width = '25%';
         document.getElementById('progressText').textContent = `Importing "${playlistInfo.name}" (${playlistInfo.totalTracks} tracks)...`;
