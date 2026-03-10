@@ -8,8 +8,8 @@
     }
   },
   "env": [
-    "SPOTIFY_CLIENT_ID",
-    "SPOTIFY_CLIENT_SECRET",
-    "SPOTIFY_REDIRECT_URI"
+    "d9be83c33d0f4befba2cc8bc80ca0b87",
+    "3ce3803a0ef84ec4b6d76c50e0974b97",
+    "https://debridify.vercel.app/callback"
   ]
 }
