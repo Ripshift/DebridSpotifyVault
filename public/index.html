@@ -653,18 +653,21 @@
 
       try {
         // 1. Fetch playlist info
+        console.log('[Import] Step 1: Fetching playlist info...', { playlistId, hasAccessToken: !!accessToken });
         const infoResp = await fetch('/api/playlist-info', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ accessToken, playlistId }),
         });
         const playlistInfo = await infoResp.json();
-        if (!infoResp.ok) throw new Error(playlistInfo.error || 'Could not fetch playlist info');
+        console.log('[Import] Playlist info response:', { status: infoResp.status, ok: infoResp.ok, data: playlistInfo });
+        if (!infoResp.ok) throw new Error(`Playlist info failed (${infoResp.status}): ${playlistInfo.error || playlistInfo.message || 'Unknown error'}`);
 
         document.getElementById('progressFill').style.width = '25%';
         document.getElementById('progressText').textContent = `Importing "${playlistInfo.name}" (${playlistInfo.totalTracks} tracks)...`;
 
         // 2. Run the import
+        console.log('[Import] Step 2: Running import...', { playlistId, hasAccessToken: !!accessToken, hasDebridToken: !!profile.token, trackerCount: importState.selectedTrackers.length });
         const importResp = await fetch('/api/import', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -676,7 +679,8 @@
           }),
         });
         const importData = await importResp.json();
-        if (!importResp.ok) throw new Error(importData.error || 'Import failed');
+        console.log('[Import] Import response:', { status: importResp.status, ok: importResp.ok, dataLength: importData.results ? importData.results.length : 0, error: importData.error });
+        if (!importResp.ok) throw new Error(`Import failed (${importResp.status}): ${importData.error || importData.message || 'Unknown error'}`);
 
         document.getElementById('progressFill').style.width = '90%';
         document.getElementById('progressText').textContent = 'Saving to library...';
@@ -750,7 +754,8 @@
         saveData(d);
 
       } catch (err) {
-        showError('Import failed: ' + err.message);
+        console.error('[Import] Error:', err);
+        showError('Import failed: ' + (err instanceof Error ? err.message : String(err)));
         document.getElementById('progressText').textContent = 'Import failed.';
         document.getElementById('importDoneBtn').textContent = 'Back';
         document.getElementById('importDoneBtn').style.display = 'block';
