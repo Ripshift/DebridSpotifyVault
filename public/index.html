@@ -294,6 +294,11 @@
 
           <div class="form-group">
             <label>Select Trackers</label>
+            <div style="margin-bottom:8px;">
+              <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:400;font-size:13px;">
+                <input type="checkbox" id="checkAllTrackers" onchange="toggleAllTrackers(this.checked)"> Check All
+              </label>
+            </div>
             <div class="tracker-list" id="trackerList"></div>
           </div>
 
@@ -561,10 +566,21 @@
       const list = document.getElementById('trackerList');
       list.innerHTML = trackers.map(t => `
         <div class="tracker-item">
-          <input type="checkbox" id="tracker-${t.id}" value="${t.id}" ${defaultTrackers.includes(t.id) ? 'checked' : ''}>
+          <input type="checkbox" id="tracker-${t.id}" value="${t.id}" ${defaultTrackers.includes(t.id) ? 'checked' : ''} onchange="syncCheckAll()">
           <label for="tracker-${t.id}">${t.name}</label>
         </div>
       `).join('');
+      syncCheckAll();
+    }
+
+    function toggleAllTrackers(checked) {
+      document.querySelectorAll('#trackerList input[type="checkbox"]').forEach(cb => cb.checked = checked);
+    }
+
+    function syncCheckAll() {
+      const all = document.querySelectorAll('#trackerList input[type="checkbox"]');
+      const checked = document.querySelectorAll('#trackerList input[type="checkbox"]:checked');
+      document.getElementById('checkAllTrackers').checked = all.length === checked.length;
     }
 
     function showImportConfig() {
