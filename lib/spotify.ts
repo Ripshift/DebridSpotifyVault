@@ -46,3 +46,34 @@ export const getPlaylistTracks = async (
   }
   return tracks;
 };
+
+export const getPlaylistInfo = async (
+  accessToken: string,
+  playlistId: string,
+): Promise<{
+  id: string;
+  name: string;
+  description: string;
+  owner: string;
+  imageUrl: string;
+  totalTracks: number;
+  spotifyUrl: string;
+}> => {
+  const api = new SpotifyWebApi({
+    clientId: process.env.SPOTIFY_CLIENT_ID || 'default_client_id',
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET || 'default_client_secret',
+  });
+  api.setAccessToken(accessToken);
+
+  const data = await api.getPlaylist(playlistId);
+  const p = data.body;
+  return {
+    id: p.id,
+    name: p.name,
+    description: p.description || '',
+    owner: p.owner.display_name || p.owner.id,
+    imageUrl: p.images?.[0]?.url || '',
+    totalTracks: p.tracks.total,
+    spotifyUrl: p.external_urls.spotify,
+  };
+};

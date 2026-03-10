@@ -5,142 +5,109 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Debridify – Spotify to Real-Debrid</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      padding: 20px;
+      padding: 30px 20px;
     }
 
     .container {
       background: white;
       border-radius: 12px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      max-width: 600px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 750px;
       width: 100%;
-      padding: 40px;
+      padding: 35px 40px;
     }
 
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-      color: #333;
-    }
+    h1 { font-size: 28px; color: #333; }
+    h2 { font-size: 20px; color: #333; margin-bottom: 15px; }
+    h3 { font-size: 16px; color: #333; margin-bottom: 12px; }
+    .subtitle { color: #666; margin-bottom: 25px; font-size: 14px; }
 
-    .subtitle {
-      color: #666;
-      margin-bottom: 30px;
-      font-size: 14px;
-    }
-
-    .form-group {
+    /* --- Navigation Tabs --- */
+    .nav-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid #e0e0e0;
       margin-bottom: 25px;
     }
-
-    label {
-      display: block;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 8px;
+    .nav-tab {
+      padding: 10px 20px;
+      background: none;
+      border: none;
       font-size: 14px;
+      font-weight: 600;
+      color: #888;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+      width: auto;
+    }
+    .nav-tab:hover { color: #667eea; }
+    .nav-tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
     }
 
+    /* --- Form Styles --- */
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-weight: 600; color: #333; margin-bottom: 6px; font-size: 14px; }
+
     input[type="text"],
-    input[type="password"],
-    textarea {
+    input[type="password"] {
       width: 100%;
-      padding: 12px;
+      padding: 10px 12px;
       border: 2px solid #e0e0e0;
       border-radius: 6px;
       font-size: 14px;
       transition: border-color 0.2s;
       font-family: inherit;
     }
+    input:focus { outline: none; border-color: #667eea; }
 
-    input[type="text"]:focus,
-    input[type="password"]:focus,
-    textarea:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-
-    .trackers-section {
-      margin-bottom: 25px;
-    }
-
-    .trackers-section h3 {
-      font-size: 16px;
-      margin-bottom: 15px;
-      color: #333;
-    }
-
-    .tracker-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .tracker-item {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .tracker-item:hover {
-      background: #f5f5f5;
-    }
-
-    .tracker-item input[type="checkbox"] {
-      margin-right: 12px;
-      cursor: pointer;
-      width: 18px;
-      height: 18px;
-    }
-
-    .tracker-item label {
-      margin: 0;
-      cursor: pointer;
-      flex: 1;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
+    button, .btn {
+      padding: 11px 20px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
       border-radius: 6px;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.2s, opacity 0.2s;
+      width: auto;
     }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    button:hover {
-      transform: translateY(-2px);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    .loading {
-      display: none;
-      text-align: center;
+    .btn-sm { padding: 6px 14px; font-size: 13px; }
+    .btn-danger { background: #e53935; }
+    .btn-success { background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%); }
+    .btn-secondary { background: #78909c; }
+    .btn-outline {
+      background: transparent;
       color: #667eea;
-      margin-top: 20px;
+      border: 2px solid #667eea;
+    }
+    .btn-outline:hover { background: #667eea; color: white; }
+    .btn-full { width: 100%; }
+
+    .instructions {
+      background: #f9f9f9;
+      padding: 12px 15px;
+      border-radius: 6px;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.5;
     }
 
     .error {
@@ -149,74 +116,112 @@
       background: #ffebee;
       color: #c62828;
       border-radius: 6px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       font-size: 14px;
     }
-
-    .success {
+    .success-msg {
       display: none;
       padding: 12px;
       background: #e8f5e9;
       color: #2e7d32;
       border-radius: 6px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       font-size: 14px;
     }
 
-    .step {
-      display: none;
-    }
-
-    .step.active {
-      display: block;
-    }
-
-    .back-btn {
-      background: #f0f0f0;
-      color: #333;
-      margin-top: 15px;
-    }
-
-    .back-btn:hover {
-      background: #e0e0e0;
-    }
-
-    .auth-button {
-      background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
-      margin-bottom: 15px;
-    }
-
-    .instructions {
-      background: #f9f9f9;
-      padding: 15px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-      font-size: 13px;
-      color: #666;
-      line-height: 1.6;
-    }
-
-    .progress {
+    /* --- Profile Cards --- */
+    .profile-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .profile-card {
       display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
     }
+    .profile-card:hover { border-color: #667eea; background: #f8f7ff; }
+    .profile-card.active { border-color: #667eea; background: #f0edff; }
+    .profile-info { flex: 1; }
+    .profile-name { font-weight: 600; font-size: 15px; color: #333; }
+    .profile-meta { font-size: 12px; color: #888; margin-top: 2px; }
+    .profile-actions { display: flex; gap: 8px; align-items: center; }
 
-    .progress-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #e0e0e0;
-      transition: background 0.3s;
+    /* --- Tracker Grid --- */
+    .tracker-list { display: grid; gap: 8px; grid-template-columns: 1fr 1fr; margin-bottom: 15px; }
+    .tracker-item {
+      display: flex; align-items: center; padding: 8px 10px;
+      border: 1px solid #e0e0e0; border-radius: 6px; cursor: pointer; transition: background 0.2s;
     }
+    .tracker-item:hover { background: #f5f5f5; }
+    .tracker-item input[type="checkbox"] { margin-right: 8px; cursor: pointer; }
+    .tracker-item label { margin: 0; cursor: pointer; font-size: 13px; font-weight: 400; }
 
-    .progress-dot.active {
-      background: #667eea;
+    /* --- Library --- */
+    .playlist-list { display: flex; flex-direction: column; gap: 12px; }
+    .playlist-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      transition: box-shadow 0.2s;
+      cursor: pointer;
     }
+    .playlist-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .playlist-header { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+    .playlist-thumb {
+      width: 50px; height: 50px; border-radius: 4px;
+      background: #e0e0e0; object-fit: cover; flex-shrink: 0;
+    }
+    .playlist-title { font-weight: 600; font-size: 15px; color: #333; }
+    .playlist-sub { font-size: 12px; color: #888; margin-top: 2px; }
+    .playlist-stats { display: flex; gap: 20px; font-size: 13px; color: #666; }
+    .stat-label { font-weight: 600; }
 
-    .progress-dot.done {
-      background: #4caf50;
+    .track-list { margin-top: 12px; max-height: 350px; overflow-y: auto; }
+    .track-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px;
     }
+    .track-item:last-child { border-bottom: none; }
+    .track-title { color: #333; font-weight: 500; }
+    .track-artists { color: #888; font-size: 12px; }
+    .status-badge {
+      padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
+    }
+    .status-added { background: #e8f5e9; color: #2e7d32; }
+    .status-not_found { background: #fff3e0; color: #e65100; }
+    .status-error { background: #ffebee; color: #c62828; }
+    .status-pending { background: #e3f2fd; color: #1565c0; }
+
+    /* --- Sections --- */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .empty-state {
+      text-align: center; padding: 40px 20px; color: #888;
+    }
+    .empty-state p { margin-bottom: 15px; }
+
+    .flex-between { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+    .flex-gap { display: flex; gap: 10px; align-items: center; }
+    .mt-15 { margin-top: 15px; }
+    .mb-15 { margin-bottom: 15px; }
+    .text-center { text-align: center; }
+
+    .divider { border: none; border-top: 1px solid #e0e0e0; margin: 20px 0; }
+
+    /* --- Progress bar --- */
+    .import-progress { margin: 20px 0; }
+    .progress-bar {
+      height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 3px; transition: width 0.3s;
+      width: 0%;
+    }
+    .progress-text { font-size: 13px; color: #666; margin-top: 8px; text-align: center; }
   </style>
 </head>
 <body>
@@ -225,101 +230,209 @@
     <p class="subtitle">Convert Spotify playlists to Real-Debrid torrents</p>
 
     <div id="error" class="error"></div>
-    <div id="success" class="success"></div>
+    <div id="success" class="success-msg"></div>
 
-    <!-- Step 1: Config -->
-    <div id="step-config" class="step active">
-      <div class="progress">
-        <div class="progress-dot active"></div>
-        <div class="progress-dot"></div>
-        <div class="progress-dot"></div>
+    <!-- Nav Tabs -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="profiles" onclick="switchTab('profiles')">Profiles</button>
+      <button class="nav-tab" data-tab="import" onclick="switchTab('import')">Import</button>
+      <button class="nav-tab" data-tab="library" onclick="switchTab('library')">Library</button>
+    </div>
+
+    <!-- ==================== PROFILES TAB ==================== -->
+    <div id="tab-profiles" class="section active">
+      <div class="flex-between">
+        <h2 style="margin-bottom:0">Your Profiles</h2>
+        <button class="btn-sm" onclick="showAddProfile()">+ Add Profile</button>
       </div>
 
-      <form id="configForm">
+      <!-- Add/Edit Profile Form (hidden by default) -->
+      <div id="profileForm" style="display:none" class="mb-15">
         <div class="form-group">
-          <label for="debridToken">Real-Debrid API Token</label>
-          <input
-            type="password"
-            id="debridToken"
-            name="debridToken"
-            placeholder="Paste your Real-Debrid API key"
-            required
-          />
+          <label for="profileName">Profile Name</label>
+          <input type="text" id="profileName" placeholder="e.g., My Account" />
+        </div>
+        <div class="form-group">
+          <label for="profileToken">Real-Debrid API Token</label>
+          <input type="password" id="profileToken" placeholder="Paste your API key" />
           <div class="instructions">
-            Get your API token from <a href="https://real-debrid.com/account/credentials" target="_blank">Real-Debrid Settings</a>
+            Get your token from <a href="https://real-debrid.com/account/credentials" target="_blank">Real-Debrid Settings</a>
           </div>
         </div>
+        <div class="flex-gap">
+          <button onclick="saveProfile()">Validate & Save</button>
+          <button class="btn-secondary btn-sm" onclick="cancelProfileForm()">Cancel</button>
+        </div>
+        <hr class="divider">
+      </div>
 
-        <div class="form-group trackers-section">
-          <label>Select Trackers</label>
-          <div class="tracker-list" id="trackerList">
-            <!-- Populated by JS -->
+      <div id="profileList" class="profile-list">
+        <!-- Populated by JS -->
+      </div>
+      <div id="noProfiles" class="empty-state" style="display:none">
+        <p>No profiles yet. Add your Real-Debrid API token to get started.</p>
+        <button onclick="showAddProfile()">+ Add Profile</button>
+      </div>
+    </div>
+
+    <!-- ==================== IMPORT TAB ==================== -->
+    <div id="tab-import" class="section">
+      <!-- Step 1: Select profile & trackers -->
+      <div id="import-config" class="section active">
+        <h2>Import a Playlist</h2>
+
+        <div id="importNoProfile" class="empty-state" style="display:none">
+          <p>You need to add a profile first.</p>
+          <button onclick="switchTab('profiles'); showAddProfile();">+ Add Profile</button>
+        </div>
+
+        <div id="importConfigContent">
+          <div class="form-group">
+            <label>Active Profile</label>
+            <div id="activeProfileBadge" style="padding: 10px; background: #f0edff; border-radius: 6px; font-weight: 600; color: #333;"></div>
           </div>
-        </div>
 
-        <button type="submit">Next: Select Playlist</button>
-      </form>
-    </div>
+          <div class="form-group">
+            <label>Select Trackers</label>
+            <div class="tracker-list" id="trackerList"></div>
+          </div>
 
-    <!-- Step 2: Spotify Auth & Playlist Selection -->
-    <div id="step-playlist" class="step">
-      <div class="progress">
-        <div class="progress-dot done"></div>
-        <div class="progress-dot active"></div>
-        <div class="progress-dot"></div>
-      </div>
-
-      <div class="instructions">
-        You'll be redirected to Spotify to authorize access to your playlists.
-      </div>
-
-      <button id="spotifyAuthBtn" type="button">🎵 Authorize with Spotify</button>
-
-      <div class="form-group">
-        <label for="playlistId">Or paste Spotify Playlist ID:</label>
-        <input
-          type="text"
-          id="playlistId"
-          placeholder="e.g., 37i9dQZF1DXcBWIGoYsB"
-        />
-        <button id="proceedBtn" type="button" style="margin-top: 10px;">Proceed to Import</button>
-      </div>
-
-      <button id="backFromPlaylist" class="back-btn" type="button">Back</button>
-    </div>
-
-    <!-- Step 3: Import -->
-    <div id="step-import" class="step">
-      <div class="progress">
-        <div class="progress-dot done"></div>
-        <div class="progress-dot done"></div>
-        <div class="progress-dot active"></div>
-      </div>
-
-      <div id="importStatus">
-        <p style="text-align: center; color: #666; margin: 20px 0;">Importing playlist...</p>
-        <div class="loading" style="display: block;">
-          <p>⏳ This may take a few minutes...</p>
+          <button class="btn-full" onclick="goToPlaylistStep()">Next: Select Playlist</button>
         </div>
       </div>
 
-      <div id="importResults" style="display: none; max-height: 300px; overflow-y: auto;">
-        <!-- Results populated by JS -->
+      <!-- Step 2: Spotify Auth & Playlist -->
+      <div id="import-playlist" class="section">
+        <h2>Choose Playlist</h2>
+        <div class="instructions mb-15">
+          Authorize with Spotify, or paste a playlist ID/URL directly.
+        </div>
+        <button class="btn-success btn-full mb-15" onclick="authorizeSpotify()">🎵 Authorize with Spotify</button>
+        <div class="form-group">
+          <label for="playlistInput">Playlist ID or URL</label>
+          <input type="text" id="playlistInput" placeholder="e.g., 37i9dQZF1DXcBWIGoYsB or full Spotify URL" />
+        </div>
+        <button class="btn-full mb-15" onclick="startImport()">Import Playlist</button>
+        <button class="btn-secondary btn-full" onclick="showImportConfig()">Back</button>
       </div>
 
-      <button id="startOver" type="button" style="display: none; margin-top: 15px;">Start Over</button>
+      <!-- Step 3: Import progress -->
+      <div id="import-progress" class="section">
+        <h2>Importing...</h2>
+        <div class="import-progress">
+          <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+          <div id="progressText" class="progress-text">Starting import...</div>
+        </div>
+        <div id="importResults" class="track-list" style="display:none;"></div>
+        <button id="importDoneBtn" class="btn-full mt-15" style="display:none" onclick="finishImport()">Done – View in Library</button>
+      </div>
+    </div>
+
+    <!-- ==================== LIBRARY TAB ==================== -->
+    <div id="tab-library" class="section">
+      <div class="flex-between">
+        <h2 style="margin-bottom:0">Music Library</h2>
+        <select id="libraryProfileFilter" onchange="renderLibrary()" style="padding: 6px 10px; border-radius: 6px; border: 2px solid #e0e0e0; font-size: 13px;">
+          <option value="all">All Profiles</option>
+        </select>
+      </div>
+
+      <div id="libraryList" class="playlist-list"></div>
+      <div id="noLibrary" class="empty-state" style="display:none">
+        <p>Your music library is empty. Import a playlist to get started.</p>
+        <button onclick="switchTab('import')">Import a Playlist</button>
+      </div>
+
+      <!-- Playlist Detail View -->
+      <div id="playlistDetail" style="display:none">
+        <button class="btn-secondary btn-sm mb-15" onclick="closePlaylistDetail()">← Back to Library</button>
+        <div id="playlistDetailContent"></div>
+      </div>
     </div>
   </div>
 
   <script>
-    // State
-    let state = {
-      debridToken: null,
-      selectedTrackers: [],
-      playlistId: null,
-      accessToken: null,
-    };
+    // ============================================================
+    // DATA LAYER – localStorage only
+    // ============================================================
+    const STORAGE_KEY = 'debridify_data';
 
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch {}
+      return { profiles: [], activeProfileId: null, playlists: [], tracks: [] };
+    }
+
+    function saveData(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function uuid() {
+      return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+    }
+
+    // ---- Profiles ----
+    function getProfiles() { return loadData().profiles; }
+    function getActiveProfile() {
+      const d = loadData();
+      return d.profiles.find(p => p.id === d.activeProfileId) || null;
+    }
+    function setActiveProfile(id) {
+      const d = loadData();
+      d.activeProfileId = id;
+      saveData(d);
+    }
+    function addProfile(name, token, username) {
+      const d = loadData();
+      const profile = { id: uuid(), name, token, username, createdAt: Date.now(), lastUsed: Date.now() };
+      d.profiles.push(profile);
+      if (!d.activeProfileId) d.activeProfileId = profile.id;
+      saveData(d);
+      return profile;
+    }
+    function deleteProfile(id) {
+      const d = loadData();
+      d.profiles = d.profiles.filter(p => p.id !== id);
+      if (d.activeProfileId === id) {
+        d.activeProfileId = d.profiles.length ? d.profiles[0].id : null;
+      }
+      saveData(d);
+    }
+
+    // ---- Playlists ----
+    function getPlaylists(profileId) {
+      const d = loadData();
+      if (profileId && profileId !== 'all') return d.playlists.filter(p => p.profileId === profileId);
+      return d.playlists;
+    }
+    function addPlaylist(record) {
+      const d = loadData();
+      d.playlists.push(record);
+      saveData(d);
+    }
+
+    // ---- Tracks ----
+    function getTracksForPlaylist(playlistRecordId) {
+      const d = loadData();
+      return d.tracks.filter(t => t.playlistRecordId === playlistRecordId);
+    }
+    function addTracks(trackRecords) {
+      const d = loadData();
+      d.tracks.push(...trackRecords);
+      saveData(d);
+    }
+    function deletePlaylistRecord(playlistRecordId) {
+      const d = loadData();
+      d.playlists = d.playlists.filter(p => p.id !== playlistRecordId);
+      d.tracks = d.tracks.filter(t => t.playlistRecordId !== playlistRecordId);
+      saveData(d);
+    }
+
+    // ============================================================
+    // TRACKER CONFIG
+    // ============================================================
     const trackers = [
       { id: 'opentrackr', name: 'OpenTrackr' },
       { id: 'coppersurfer', name: 'Coppersurfer (UDP)' },
@@ -340,19 +453,110 @@
       { id: 'open-stealth', name: 'Open Stealth (UDP)' },
       { id: 'shadowshq-eddie', name: 'ShadowSHQ Eddie (UDP)' },
     ];
+    const defaultTrackers = ['opentrackr','coppersurfer','kicks-ass','explodie','pow7','tracker-leechers','rarbg-2710'];
 
-    // Trackers checked by default
-    const defaultTrackers = [
-      'opentrackr',
-      'coppersurfer',
-      'kicks-ass',
-      'explodie',
-      'pow7',
-      'tracker-leechers',
-      'rarbg-2710',
-    ];
+    // ============================================================
+    // UI STATE
+    // ============================================================
+    let currentTab = 'profiles';
+    let importState = { selectedTrackers: [], playlistId: null, accessToken: null };
 
-    // Initialize tracker list
+    // ============================================================
+    // NAVIGATION
+    // ============================================================
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+      document.querySelectorAll('.container > .section').forEach(s => s.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      clearMessages();
+
+      if (tab === 'profiles') renderProfiles();
+      if (tab === 'import') showImportConfig();
+      if (tab === 'library') { closePlaylistDetail(); renderLibrary(); }
+    }
+
+    // ============================================================
+    // PROFILES TAB
+    // ============================================================
+    function renderProfiles() {
+      const profiles = getProfiles();
+      const active = getActiveProfile();
+      const list = document.getElementById('profileList');
+      const empty = document.getElementById('noProfiles');
+
+      if (!profiles.length) {
+        list.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+      }
+      list.style.display = 'flex';
+      empty.style.display = 'none';
+
+      list.innerHTML = profiles.map(p => `
+        <div class="profile-card ${p.id === active?.id ? 'active' : ''}" onclick="selectProfile('${p.id}')">
+          <div class="profile-info">
+            <div class="profile-name">${esc(p.name)}</div>
+            <div class="profile-meta">${esc(p.username || 'Real-Debrid')} · Created ${new Date(p.createdAt).toLocaleDateString()}</div>
+          </div>
+          <div class="profile-actions">
+            ${p.id === active?.id ? '<span style="color:#667eea;font-size:12px;font-weight:600;">ACTIVE</span>' : ''}
+            <button class="btn-sm btn-danger" onclick="event.stopPropagation(); removeProfile('${p.id}')">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function showAddProfile() {
+      document.getElementById('profileForm').style.display = 'block';
+      document.getElementById('profileName').focus();
+    }
+    function cancelProfileForm() {
+      document.getElementById('profileForm').style.display = 'none';
+      document.getElementById('profileName').value = '';
+      document.getElementById('profileToken').value = '';
+    }
+
+    async function saveProfile() {
+      const name = document.getElementById('profileName').value.trim();
+      const token = document.getElementById('profileToken').value.trim();
+      if (!name) return showError('Profile name is required');
+      if (!token) return showError('API token is required');
+
+      try {
+        showSuccess('Validating token...');
+        const resp = await fetch('/api/validate-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        });
+        const data = await resp.json();
+        if (!data.valid) throw new Error(data.error || 'Invalid token');
+
+        addProfile(name, token, data.username);
+        cancelProfileForm();
+        clearMessages();
+        showSuccess(`Profile "${name}" added (${data.username})`);
+        renderProfiles();
+      } catch (err) {
+        showError('Token validation failed: ' + err.message);
+      }
+    }
+
+    function selectProfile(id) {
+      setActiveProfile(id);
+      renderProfiles();
+    }
+
+    function removeProfile(id) {
+      if (!confirm('Delete this profile? Library data for this profile will remain.')) return;
+      deleteProfile(id);
+      renderProfiles();
+    }
+
+    // ============================================================
+    // IMPORT TAB
+    // ============================================================
     function initTrackers() {
       const list = document.getElementById('trackerList');
       list.innerHTML = trackers.map(t => `
@@ -363,150 +567,376 @@
       `).join('');
     }
 
-    // Step 1: Config form submit
-    document.getElementById('configForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      state.debridToken = document.getElementById('debridToken').value;
-      state.selectedTrackers = Array.from(
-        document.querySelectorAll('input[type="checkbox"]:checked')
+    function showImportConfig() {
+      const profile = getActiveProfile();
+      document.getElementById('import-config').classList.add('active');
+      document.getElementById('import-playlist').classList.remove('active');
+      document.getElementById('import-progress').classList.remove('active');
+
+      if (!profile) {
+        document.getElementById('importNoProfile').style.display = 'block';
+        document.getElementById('importConfigContent').style.display = 'none';
+        return;
+      }
+      document.getElementById('importNoProfile').style.display = 'none';
+      document.getElementById('importConfigContent').style.display = 'block';
+      document.getElementById('activeProfileBadge').textContent = `${profile.name} (${profile.username || 'Real-Debrid'})`;
+    }
+
+    function goToPlaylistStep() {
+      importState.selectedTrackers = Array.from(
+        document.querySelectorAll('#trackerList input[type="checkbox"]:checked')
       ).map(cb => cb.value);
 
-      if (!state.debridToken) {
-        showError('Real-Debrid API token is required');
-        return;
-      }
+      document.getElementById('import-config').classList.remove('active');
+      document.getElementById('import-playlist').classList.add('active');
+    }
 
-      goToStep('playlist');
-    });
-
-    // Step 2: Spotify auth
-    document.getElementById('spotifyAuthBtn').addEventListener('click', () => {
+    function authorizeSpotify() {
+      // Save import state so we can restore after OAuth redirect
+      sessionStorage.setItem('debridify_import', JSON.stringify(importState));
       window.location.href = '/api/auth/spotify';
-    });
-
-    // Step 2: Manual playlist ID
-    document.getElementById('proceedBtn').addEventListener('click', () => {
-      const playlistId = document.getElementById('playlistId').value;
-      if (!playlistId) {
-        showError('Please enter a playlist ID or authorize with Spotify');
-        return;
-      }
-      state.playlistId = playlistId;
-      startImport();
-    });
-
-    // Back buttons
-    document.getElementById('backFromPlaylist').addEventListener('click', () => {
-      goToStep('config');
-    });
-
-    document.getElementById('startOver').addEventListener('click', () => {
-      state = {
-        debridToken: null,
-        selectedTrackers: [],
-        playlistId: null,
-        accessToken: null,
-      };
-      goToStep('config');
-      document.getElementById('configForm').reset();
-    });
-
-    // Helper functions
-    function goToStep(step) {
-      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-      document.getElementById(`step-${step}`).classList.add('active');
-      clearMessages();
     }
 
-    function startImport() {
-      goToStep('import');
-      
-      // Simulate checking for access token in URL or localStorage
+    function extractPlaylistId(input) {
+      if (!input) return null;
+      // Handle full Spotify URLs
+      const urlMatch = input.match(/playlist[/:]([a-zA-Z0-9]+)/);
+      if (urlMatch) return urlMatch[1];
+      // Handle plain IDs
+      if (/^[a-zA-Z0-9]{15,}$/.test(input.trim())) return input.trim();
+      return null;
+    }
+
+    async function startImport() {
+      const raw = document.getElementById('playlistInput').value.trim();
+      const playlistId = extractPlaylistId(raw);
+      if (!playlistId) return showError('Please enter a valid Spotify playlist ID or URL');
+
+      const profile = getActiveProfile();
+      if (!profile) return showError('No active profile selected');
+
+      // Check for access token from URL params or session
       const params = new URLSearchParams(window.location.search);
-      const accessToken = params.get('accessToken') || localStorage.getItem('spotifyAccessToken');
-      
-      if (accessToken) {
-        state.accessToken = accessToken;
-        localStorage.removeItem('spotifyAccessToken');
-      }
+      const accessToken = params.get('accessToken') || importState.accessToken;
+      if (!accessToken) return showError('Please authorize with Spotify first, or paste a playlist ID after authorization');
 
-      performImport();
-    }
+      importState.playlistId = playlistId;
+      importState.accessToken = accessToken;
 
-    async function performImport() {
+      // Show progress UI
+      document.getElementById('import-playlist').classList.remove('active');
+      document.getElementById('import-progress').classList.add('active');
+      document.getElementById('importResults').style.display = 'none';
+      document.getElementById('importDoneBtn').style.display = 'none';
+      document.getElementById('progressFill').style.width = '10%';
+      document.getElementById('progressText').textContent = 'Fetching playlist info...';
+
+      // Clean URL
+      window.history.replaceState({}, '', '/');
+
       try {
-        const response = await fetch('/api/import', {
+        // 1. Fetch playlist info
+        const infoResp = await fetch('/api/playlist-info', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken, playlistId }),
+        });
+        const playlistInfo = await infoResp.json();
+        if (!infoResp.ok) throw new Error(playlistInfo.error || 'Could not fetch playlist info');
+
+        document.getElementById('progressFill').style.width = '25%';
+        document.getElementById('progressText').textContent = `Importing "${playlistInfo.name}" (${playlistInfo.totalTracks} tracks)...`;
+
+        // 2. Run the import
+        const importResp = await fetch('/api/import', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            playlistId: state.playlistId,
-            accessToken: state.accessToken,
-            debridToken: state.debridToken,
-            trackers: state.selectedTrackers,
+            playlistId,
+            accessToken,
+            debridToken: profile.token,
+            trackers: importState.selectedTrackers,
           }),
         });
+        const importData = await importResp.json();
+        if (!importResp.ok) throw new Error(importData.error || 'Import failed');
 
-        const data = await response.json();
+        document.getElementById('progressFill').style.width = '90%';
+        document.getElementById('progressText').textContent = 'Saving to library...';
 
-        if (!response.ok) {
-          throw new Error(data.error || 'Import failed');
-        }
+        // 3. Save to localStorage – playlist record
+        const playlistRecordId = uuid();
+        const playlistRecord = {
+          id: playlistRecordId,
+          profileId: profile.id,
+          spotifyPlaylistId: playlistId,
+          playlistName: playlistInfo.name,
+          spotifyUrl: playlistInfo.spotifyUrl,
+          imageUrl: playlistInfo.imageUrl || '',
+          owner: playlistInfo.owner || '',
+          description: playlistInfo.description || '',
+          tracksCount: importData.total,
+          importedAt: Date.now(),
+          trackerIds: importState.selectedTrackers,
+        };
+        addPlaylist(playlistRecord);
 
-        displayResults(data);
+        // 4. Save tracks
+        const trackRecords = (importData.results || []).map(r => ({
+          id: uuid(),
+          playlistRecordId,
+          spotifyTrackId: r.spotifyTrackId || '',
+          name: r.name,
+          artists: r.artists || [],
+          album: r.album || '',
+          spotifyUrl: r.spotifyUrl || '',
+          durationMs: r.durationMs || 0,
+          status: r.status,
+          debridTorrentId: r.debridTorrentId || null,
+          rawMetadata: r.rawMetadata || {},
+        }));
+        addTracks(trackRecords);
+
+        // 5. Show results
+        document.getElementById('progressFill').style.width = '100%';
+        document.getElementById('progressText').textContent = 'Import complete!';
+
+        const added = trackRecords.filter(t => t.status === 'added').length;
+        const notFound = trackRecords.filter(t => t.status === 'not_found').length;
+        const errored = trackRecords.filter(t => t.status === 'error').length;
+
+        let html = `<div style="margin-bottom:12px;font-size:14px;">
+          <strong>${importData.total}</strong> tracks processed:
+          <span class="status-badge status-added">${added} added</span>
+          <span class="status-badge status-not_found">${notFound} not found</span>
+          ${errored ? `<span class="status-badge status-error">${errored} errors</span>` : ''}
+        </div>`;
+
+        trackRecords.forEach(t => {
+          html += `<div class="track-item">
+            <div>
+              <div class="track-title">${esc(t.name)}</div>
+              <div class="track-artists">${esc(t.artists.join(', '))}</div>
+            </div>
+            <span class="status-badge status-${t.status}">${t.status.replace('_', ' ')}</span>
+          </div>`;
+        });
+
+        document.getElementById('importResults').innerHTML = html;
+        document.getElementById('importResults').style.display = 'block';
+        document.getElementById('importDoneBtn').style.display = 'block';
+
+        // Update profile lastUsed
+        const d = loadData();
+        const p = d.profiles.find(x => x.id === profile.id);
+        if (p) p.lastUsed = Date.now();
+        saveData(d);
+
       } catch (err) {
-        showError(`Import failed: ${err.message}`);
-        document.getElementById('importStatus').style.display = 'none';
-        document.getElementById('startOver').style.display = 'block';
+        showError('Import failed: ' + err.message);
+        document.getElementById('progressText').textContent = 'Import failed.';
+        document.getElementById('importDoneBtn').textContent = 'Back';
+        document.getElementById('importDoneBtn').style.display = 'block';
       }
     }
 
-    function displayResults(data) {
-      const status = document.getElementById('importStatus');
-      const results = document.getElementById('importResults');
+    function finishImport() {
+      importState = { selectedTrackers: [], playlistId: null, accessToken: null };
+      switchTab('library');
+    }
 
-      status.style.display = 'none';
-      results.style.display = 'block';
+    // ============================================================
+    // LIBRARY TAB
+    // ============================================================
+    function renderLibrary() {
+      const filter = document.getElementById('libraryProfileFilter').value;
+      const playlists = getPlaylists(filter);
+      const profiles = getProfiles();
+      const list = document.getElementById('libraryList');
+      const empty = document.getElementById('noLibrary');
 
-      let html = `<h3>Import Complete</h3>`;
-      html += `<p><strong>${data.total}</strong> tracks processed:</p>`;
-      html += `<ul style="margin: 15px 0; padding-left: 20px;">`;
+      // Populate profile filter dropdown
+      const sel = document.getElementById('libraryProfileFilter');
+      const current = sel.value;
+      sel.innerHTML = '<option value="all">All Profiles</option>' +
+        profiles.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+      sel.value = current || 'all';
 
-      (data.results || []).forEach(r => {
-        const icon = r.status === 'added' ? '✅' : '❌';
-        html += `<li style="margin-bottom: 8px;">${icon} ${r.track} <small>(${r.status})</small></li>`;
+      if (!playlists.length) {
+        list.style.display = 'none';
+        empty.style.display = 'block';
+        document.getElementById('playlistDetail').style.display = 'none';
+        return;
+      }
+
+      list.style.display = 'flex';
+      empty.style.display = 'none';
+
+      list.innerHTML = playlists.map(p => {
+        const tracks = getTracksForPlaylist(p.id);
+        const added = tracks.filter(t => t.status === 'added').length;
+        const profile = profiles.find(pr => pr.id === p.profileId);
+        return `
+          <div class="playlist-card" onclick="openPlaylistDetail('${p.id}')">
+            <div class="playlist-header">
+              ${p.imageUrl ? `<img class="playlist-thumb" src="${esc(p.imageUrl)}" alt="">` : '<div class="playlist-thumb"></div>'}
+              <div>
+                <div class="playlist-title">${esc(p.playlistName)}</div>
+                <div class="playlist-sub">${esc(profile?.name || 'Unknown')} · ${new Date(p.importedAt).toLocaleDateString()}</div>
+              </div>
+            </div>
+            <div class="playlist-stats">
+              <span><span class="stat-label">${p.tracksCount}</span> tracks</span>
+              <span><span class="stat-label">${added}</span> added to Debrid</span>
+              <span><a href="${esc(p.spotifyUrl)}" target="_blank" onclick="event.stopPropagation()">Open in Spotify ↗</a></span>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function openPlaylistDetail(playlistRecordId) {
+      const d = loadData();
+      const pl = d.playlists.find(p => p.id === playlistRecordId);
+      if (!pl) return;
+      const tracks = getTracksForPlaylist(playlistRecordId);
+      const profile = d.profiles.find(p => p.id === pl.profileId);
+
+      document.getElementById('libraryList').style.display = 'none';
+      document.getElementById('noLibrary').style.display = 'none';
+      document.getElementById('playlistDetail').style.display = 'block';
+
+      const added = tracks.filter(t => t.status === 'added').length;
+      const notFound = tracks.filter(t => t.status === 'not_found').length;
+      const errored = tracks.filter(t => t.status === 'error').length;
+
+      let html = `
+        <div class="playlist-header mb-15">
+          ${pl.imageUrl ? `<img class="playlist-thumb" src="${esc(pl.imageUrl)}" style="width:70px;height:70px;" alt="">` : '<div class="playlist-thumb" style="width:70px;height:70px;"></div>'}
+          <div>
+            <div class="playlist-title" style="font-size:18px;">${esc(pl.playlistName)}</div>
+            <div class="playlist-sub">${esc(profile?.name || '')} · Imported ${new Date(pl.importedAt).toLocaleDateString()}</div>
+            ${pl.description ? `<div class="playlist-sub" style="margin-top:4px;">${esc(pl.description)}</div>` : ''}
+          </div>
+        </div>
+        <div class="playlist-stats mb-15">
+          <span class="status-badge status-added">${added} added</span>
+          <span class="status-badge status-not_found">${notFound} not found</span>
+          ${errored ? `<span class="status-badge status-error">${errored} errors</span>` : ''}
+          <a href="${esc(pl.spotifyUrl)}" target="_blank" style="margin-left:auto;font-size:13px;">Open in Spotify ↗</a>
+        </div>
+        <div class="flex-between">
+          <h3 style="margin-bottom:0">Tracks</h3>
+          <div class="flex-gap">
+            <button class="btn-sm btn-outline" onclick="exportPlaylist('${playlistRecordId}')">Export JSON</button>
+            <button class="btn-sm btn-danger" onclick="removePlaylist('${playlistRecordId}')">Delete</button>
+          </div>
+        </div>
+        <div class="track-list">`;
+
+      tracks.forEach(t => {
+        html += `<div class="track-item">
+          <div>
+            <div class="track-title">${esc(t.name)}</div>
+            <div class="track-artists">${esc(t.artists.join(', '))} · ${esc(t.album)}</div>
+          </div>
+          <span class="status-badge status-${t.status}">${t.status.replace('_', ' ')}</span>
+        </div>`;
       });
 
-      html += `</ul>`;
-      results.innerHTML = html;
-      document.getElementById('startOver').style.display = 'block';
+      html += '</div>';
+      document.getElementById('playlistDetailContent').innerHTML = html;
     }
 
+    function closePlaylistDetail() {
+      document.getElementById('playlistDetail').style.display = 'none';
+      document.getElementById('libraryList').style.display = 'flex';
+    }
+
+    function removePlaylist(id) {
+      if (!confirm('Delete this playlist record from your library?')) return;
+      deletePlaylistRecord(id);
+      closePlaylistDetail();
+      renderLibrary();
+    }
+
+    function exportPlaylist(playlistRecordId) {
+      const d = loadData();
+      const pl = d.playlists.find(p => p.id === playlistRecordId);
+      const tracks = getTracksForPlaylist(playlistRecordId);
+      const exportData = {
+        playlist: pl,
+        tracks: tracks.map(t => ({
+          name: t.name,
+          artists: t.artists,
+          album: t.album,
+          spotifyUrl: t.spotifyUrl,
+          status: t.status,
+          debridTorrentId: t.debridTorrentId,
+          rawMetadata: t.rawMetadata,
+        })),
+      };
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `debridify-${(pl?.playlistName || 'playlist').replace(/[^a-z0-9]/gi, '-')}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
     function showError(msg) {
-      const err = document.getElementById('error');
-      err.textContent = msg;
-      err.style.display = 'block';
+      const el = document.getElementById('error');
+      el.textContent = msg;
+      el.style.display = 'block';
+      document.getElementById('success').style.display = 'none';
     }
-
+    function showSuccess(msg) {
+      const el = document.getElementById('success');
+      el.textContent = msg;
+      el.style.display = 'block';
+      document.getElementById('error').style.display = 'none';
+    }
     function clearMessages() {
       document.getElementById('error').style.display = 'none';
       document.getElementById('success').style.display = 'none';
     }
+    function esc(str) {
+      if (!str) return '';
+      const d = document.createElement('div');
+      d.textContent = String(str);
+      return d.innerHTML;
+    }
 
-    // Initialize on load
+    // ============================================================
+    // INIT
+    // ============================================================
     initTrackers();
+    renderProfiles();
 
-    // Check if we're coming back from Spotify callback
+    // Handle Spotify OAuth callback
     const params = new URLSearchParams(window.location.search);
     if (params.get('accessToken')) {
-      state.accessToken = params.get('accessToken');
-      state.playlistId = params.get('playlistId');
-      if (state.accessToken && state.playlistId) {
-        if (!state.debridToken) {
-          showError('Please configure your Real-Debrid token first');
-        } else {
-          startImport();
-        }
-      }
+      // Restore import state from sessionStorage
+      try {
+        const saved = sessionStorage.getItem('debridify_import');
+        if (saved) importState = JSON.parse(saved);
+        sessionStorage.removeItem('debridify_import');
+      } catch {}
+      importState.accessToken = params.get('accessToken');
+
+      // Auto-navigate to import tab playlist step
+      switchTab('import');
+      document.getElementById('import-config').classList.remove('active');
+      document.getElementById('import-playlist').classList.add('active');
+      showSuccess('Spotify authorized! Enter your playlist ID or URL and click Import.');
+    }
+
+    if (params.get('error')) {
+      showError('Spotify authorization failed: ' + params.get('error'));
     }
   </script>
 </body>

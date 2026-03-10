@@ -1,7 +1,19 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { getPlaylistTracks } from '../lib/spotify';
-import { addMagnet } from '../lib/debrid';
+import { addMagnet, selectFiles } from '../lib/debrid';
 import { search, TrackInfo } from '../lib/trackers';
+
+interface TrackResult {
+  spotifyTrackId: string;
+  name: string;
+  artists: string[];
+  album: string;
+  spotifyUrl: string;
+  durationMs: number;
+  status: 'added' | 'not_found' | 'error';
+  debridTorrentId?: string;
+  rawMetadata: Record<string, unknown>;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -26,7 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const items = await getPlaylistTracks(accessToken, playlistId);
 
-    const results: { track: string; status: string }[] = [];
+    const results: TrackResult[] = [];
 
     for (const item of items) {
       const t = item.track;
@@ -38,34 +50,47 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         album: t.album ? { name: t.album.name } : undefined,
       };
 
+      const trackResult: TrackResult = {
+        spotifyTrackId: t.id || '',
+        name: t.name,
+        artists: t.artists.map((a) => a.name),
+        album: t.album?.name || '',
+        spotifyUrl: t.external_urls?.spotify || '',
+        durationMs: t.duration_ms || 0,
+        status: 'not_found',
+        rawMetadata: {
+          id: t.id,
+          name: t.name,
+          artists: t.artists.map((a) => ({ name: a.name, id: a.id })),
+          album: t.album ? { name: t.album.name, id: t.album.id, images: t.album.images } : null,
+          duration_ms: t.duration_ms,
+          track_number: t.track_number,
+          disc_number: t.disc_number,
+          explicit: t.explicit,
+          external_urls: t.external_urls,
+          preview_url: t.preview_url,
+        },
+      };
+
       try {
         const magnet = await search(trackInfo, trackers || []);
         if (magnet) {
-          // Override env var with user-provided Debrid token
-          const originalKey = process.env.REALDEBRID_API_KEY;
-          process.env.REALDEBRID_API_KEY = debridToken;
+          const addResult = await addMagnet(magnet, debridToken);
+          // Select all files so debrid starts downloading
           try {
-            await addMagnet(magnet);
-            results.push({
-              track: `${trackInfo.artists[0]?.name} – ${trackInfo.name}`,
-              status: 'added',
-            });
-          } finally {
-            process.env.REALDEBRID_API_KEY = originalKey;
+            await selectFiles(addResult.id, debridToken);
+          } catch {
+            // Non-fatal: some torrents auto-select
           }
-        } else {
-          results.push({
-            track: `${trackInfo.artists[0]?.name} – ${trackInfo.name}`,
-            status: 'not_found',
-          });
+          trackResult.status = 'added';
+          trackResult.debridTorrentId = addResult.id;
         }
       } catch (err) {
         console.error(`Error processing track ${t.name}:`, err);
-        results.push({
-          track: `${trackInfo.artists[0]?.name} – ${trackInfo.name}`,
-          status: 'error',
-        });
+        trackResult.status = 'error';
       }
+
+      results.push(trackResult);
     }
 
     res.status(200).json({ total: items.length, results });
