@@ -10,6 +10,6 @@
   "env": {
     "SPOTIFY_CLIENT_ID": "d9be83c33d0f4befba2cc8bc80ca0b87",
     "SPOTIFY_CLIENT_SECRET": "3ce3803a0ef84ec4b6d76c50e0974b97",
-    "SPOTIFY_REDIRECT_URI": "https://debridify.vercel.app/callback"
+    "SPOTIFY_REDIRECT_URI": "https://debridify.vercel.app/api/callback"
   }
 }
